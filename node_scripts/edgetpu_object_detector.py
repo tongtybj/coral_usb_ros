@@ -86,10 +86,14 @@ class EdgeTPUObjectDetector(ConnectionBasedTransport):
     def image_cb(self, msg):
         img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         H, W = img.shape[:2]
+
+        start_t = rospy.get_time()
         objs = self.engine.DetectWithImage(
             PIL.Image.fromarray(img), threshold=self.score_thresh,
             keep_aspect_ratio=True, relative_coord=True,
             top_k=self.top_k)
+        du = rospy.get_time() - start_t
+        rospy.loginfo("proess time: %f", du);
 
         bboxes = []
         scores = []
